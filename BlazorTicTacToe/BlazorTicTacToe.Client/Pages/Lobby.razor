@@ -12,6 +12,20 @@
 
 <button @onclick="CreateRoomAsync">Create Room</button>
 
+
+<h3>Rooms:</h3>
+<ul>
+	@foreach (var room in Rooms)
+	{
+		<li>@room.RoomName <button @onclick="() => JoinRoom(room.RoomId)">Join Room</button> </li>
+	}
+</ul>
+
+
+
+
+
+
 @code {
 
 	private HubConnection? HubConnection;
@@ -30,6 +44,8 @@
 		HubConnection.On<List<GameRoom>>("Rooms", (roomList) =>
 		{
 			Console.WriteLine($"We got Rooms! Count = {roomList.Count}");
+
+			Rooms = roomList;
 		});
 
 		await HubConnection.StartAsync();
@@ -44,5 +60,25 @@
 			_CurrentRoomName, _PlayerName);
 	}
 
+
+	private async Task JoinRoom(string RoomId)
+	{
+		if (HubConnection is null)
+			return;
+
+		var joinedRoom = await HubConnection.InvokeAsync<GameRoom>(
+			"JoinRoom",
+			RoomId,
+			_PlayerName);
+
+		if (joinedRoom is not null)
+		{
+			_CurretGameRoom = joinedRoom;
+		}
+		else
+		{
+			Console.WriteLine("Room is full or does not exist.");
+		}
+	}
 
 }
