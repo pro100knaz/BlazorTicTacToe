@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using BlazorTicTacToe.Shared
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
 
@@ -17,6 +18,11 @@
 			.WithUrl(NavigationManager.ToAbsoluteUri("/gamehub"))
 			.Build();
 
+
+		HubConnection.On<List<GameRoom>>("Rooms", (roomList) =>
+		{
+			Console.WriteLine($"We got Rooms! Count = {roomList.Count}");
+		});
 
 		await HubConnection.StartAsync();
 	}
