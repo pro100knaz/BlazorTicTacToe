@@ -9,8 +9,13 @@ namespace BlazorTicTacToe.Shared
 	public class GameRoom
 	{
 		public string RoomId { get; set; }
-
 		public string RoomName { get; set; }
+
+		public GameRoom(string roomId, string roomName)
+		{
+			RoomName = roomName;
+			RoomId = roomId;
+		}
 	}
 
 	public class Player

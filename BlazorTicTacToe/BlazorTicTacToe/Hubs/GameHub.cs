@@ -17,8 +17,16 @@ namespace BlazorTicTacToe.Hubs
 		}
 
 
+		public async Task<GameRoom> CreateRoom(string roomName, string playerName)
+		{
+			var roomId = Guid.NewGuid().ToString();
+			var room = new GameRoom(roomId, roomName);
+			_rooms.Add(room);
 
+			await Clients.All.SendAsync("Rooms", _rooms.OrderBy(room => room.RoomName));
 
+			return room;
+		}
 
 	}
 }

@@ -4,13 +4,21 @@
 @inject NavigationManager NavigationManager
 
 @rendermode @(new InteractiveWebAssemblyRenderMode(false))
-
-
 <h3>Lobby</h3>
+
+<input @bind="_PlayerName" placeholder="Your Name" />
+
+<input @bind="_CurrentRoomName" placeholder="Rooom Name" />
+
+<button @onclick="CreateRoomAsync">Create Room</button>
 
 @code {
 
 	private HubConnection? HubConnection;
+	private string _PlayerName = string.Empty;
+	private string _CurrentRoomName = string.Empty;
+	private GameRoom? _CurretGameRoom;
+	private List<GameRoom> Rooms = new();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -26,5 +34,15 @@
 
 		await HubConnection.StartAsync();
 	}
+
+	private async Task CreateRoomAsync()
+	{
+		if(HubConnection is null)
+			return;
+
+		_CurretGameRoom = await HubConnection.InvokeAsync<GameRoom>("CreateRoom",
+			_CurrentRoomName, _PlayerName);
+	}
+
 
 }
