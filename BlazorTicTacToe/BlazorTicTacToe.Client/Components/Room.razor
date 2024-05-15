@@ -11,12 +11,25 @@
 	}
 
 	if (!CurrentRoom.Game.GameStarted && CurrentRoom.Game.PlayerXId != myPlayerId &&
-	    CurrentRoom.Players.Count == 2)
+		CurrentRoom.Players.Count == 2)
 	{
 		<h4>Waiting For Another Player To Start The Game ...</h4>
 	}
 
-	if((!CurrentRoom.Game.GameStarted || CurrentRoom.Game.GameOver) && CurrentRoom.Game.PlayerXId == myPlayerId &&
+
+	if (CurrentRoom.Game is { GameOver: true, IsDraw: false })
+	{
+		<h4>Game Over ! Winner: @CurrentRoom.Game.Winner</h4>
+	}
+
+
+	if (CurrentRoom.Game is { GameOver: true, IsDraw: true })
+	{
+		<h4>Game Over ! Draw !</h4>
+	}
+
+
+	if ((!CurrentRoom.Game.GameStarted || CurrentRoom.Game.GameOver) && CurrentRoom.Game.PlayerXId == myPlayerId &&
 	CurrentRoom.Players.Count == 2)
 	{
 		<button @onclick="StartGame">Start Game</button>
@@ -26,6 +39,29 @@
 	{
 		<h4>It's @CurrentRoom.Game.CurrentPlayerSymbol's  Turn </h4>
 		<span> Currently playing: @CurrentRoom.Players[0].Name (X),  @CurrentRoom.Players[1].Name (O) </span>
+
+
+		<table class="tic-tac-toe">
+			@for (int row = 0; row < 3; row++)
+			{
+				<tr>
+					@for (int col = 0; col < 3; col++)
+					{
+						var r = row;
+						var c = col;
+						<td @onclick="() => MakeMove(r,c)">
+							@CurrentRoom.Game.Board[r][c]
+						</td>
+					}
+				</tr>
+			}
+		</table>
+
+		@if (!IsMyTurn() && !CurrentRoom.Game.GameOver)
+		{
+			<p>Please wait for the other player to make a move </p>
+		}
+
 
 
 	}
@@ -45,7 +81,7 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		if(CurrentRoom is null || HubConnection is null || HubConnection.ConnectionId is null)
+		if (CurrentRoom is null || HubConnection is null || HubConnection.ConnectionId is null)
 			return;
 
 		myPlayerId = HubConnection.ConnectionId;
@@ -66,10 +102,26 @@
 
 	async Task StartGame()
 	{
-		if(HubConnection is null || CurrentRoom is null)
+		if (HubConnection is null || CurrentRoom is null)
 			return;
 
 		await HubConnection.InvokeAsync("StartGame", CurrentRoom.RoomId);
+	}
+
+
+	private async Task MakeMove(int row, int col)
+	{
+
+	}
+
+	private bool IsMyTurn()
+	{
+		if (CurrentRoom is not null)
+		{
+			return myPlayerId == CurrentRoom.Game.CurrentPlayerId;
+		}
+
+		return false;
 	}
 
 }
