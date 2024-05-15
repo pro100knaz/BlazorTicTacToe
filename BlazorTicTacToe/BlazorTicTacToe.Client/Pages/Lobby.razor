@@ -4,27 +4,30 @@
 @inject NavigationManager NavigationManager
 
 @rendermode @(new InteractiveWebAssemblyRenderMode(false))
-<h3>Lobby</h3>
+<h3>Lobby for TicTacToe</h3>
 
-<input @bind="_PlayerName" placeholder="Your Name" />
+@if (_CurretGameRoom is null)
+{
 
-<input @bind="_CurrentRoomName" placeholder="Rooom Name" />
-
-<button @onclick="CreateRoomAsync">Create Room</button>
-
-
-<h3>Rooms:</h3>
-<ul>
-	@foreach (var room in Rooms)
-	{
-		<li>@room.RoomName <button @onclick="() => JoinRoom(room.RoomId)">Join Room</button> </li>
-	}
-</ul>
+	<input @bind="_PlayerName" placeholder="Your Name"/>
+	<input @bind="_CurrentRoomName" placeholder="Rooom Name"/>
+	<button @onclick="CreateRoomAsync">Create Room</button>
 
 
-
-
-
+	<h3>Rooms:</h3>
+	<ul>
+		@foreach (var room in Rooms)
+		{
+			<li>@room.RoomName <button @onclick="() => JoinRoom(room.RoomId)">Join Room</button> </li>
+		}
+	</ul>
+}
+else
+{
+	<CascadingValue Value="HubConnection">
+		<BlazorTicTacToe.Client.Components.Room CurrentRoom="_CurretGameRoom" />
+	</CascadingValue>
+}
 
 @code {
 
@@ -46,6 +49,8 @@
 			Console.WriteLine($"We got Rooms! Count = {roomList.Count}");
 
 			Rooms = roomList;
+
+			StateHasChanged();
 		});
 
 		await HubConnection.StartAsync();

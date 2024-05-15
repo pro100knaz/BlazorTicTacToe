@@ -1,0 +1,50 @@
+﻿@using BlazorTicTacToe.Shared
+@using Microsoft.AspNetCore.SignalR.Client
+
+@if (CurrentRoom is not null)
+{
+	<h3>@CurrentRoom.RoomName</h3>
+
+	if (CurrentRoom.Players.Count < 2)
+	{
+		<h4>Waiting for another player to Join</h4>
+	}
+
+}
+
+
+@code {
+	[CascadingParameter]
+	public HubConnection? HubConnection { get; set; }
+
+	[Parameter]
+	public GameRoom? CurrentRoom { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if(CurrentRoom is null || HubConnection is null || HubConnection.ConnectionId is null)
+			return;
+
+		HubConnection.On<Player>("PlayerJoined", player =>
+		{
+			CurrentRoom.Players.Add(player);
+			StateHasChanged();
+		});
+
+		HubConnection.On<GameRoom>("UpdateGame", serverRoom =>
+		{
+			CurrentRoom = serverRoom;
+			StateHasChanged();
+		});
+	}
+
+
+	async Task StartGameAsync()
+	{
+		if(HubConnection is null || CurrentRoom is null)
+			return;
+
+		await HubConnection.InvokeAsync("StartGame", CurrentRoom.RoomId);
+	}
+
+}

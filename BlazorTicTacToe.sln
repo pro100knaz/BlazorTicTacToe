@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorTicTacToe", "BlazorTi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorTicTacToe.Client", "BlazorTicTacToe\BlazorTicTacToe.Client\BlazorTicTacToe.Client.csproj", "{80F98A84-7FD3-491D-9782-7F9C388B47C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorTicTacToe.Shared", "BlazorTicTacToe.Shared\BlazorTicTacToe.Shared.csproj", "{135EC6D8-FA83-4AD6-BBD4-40C33BACBF9A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorTicTacToe.Shared", "BlazorTicTacToe.Shared\BlazorTicTacToe.Shared.csproj", "{135EC6D8-FA83-4AD6-BBD4-40C33BACBF9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
