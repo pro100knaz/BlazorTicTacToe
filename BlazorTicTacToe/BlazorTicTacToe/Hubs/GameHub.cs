@@ -13,9 +13,7 @@ namespace BlazorTicTacToe.Hubs
 			Console.WriteLine($"Player with Id '{Context.ConnectionId}' connected");
 
 			await Clients.Caller.SendAsync("Rooms", _rooms.OrderBy(room => room.RoomName));
-
 		}
-
 
 		public async Task<GameRoom> CreateRoom(string roomName, string playerName)
 		{
@@ -60,6 +58,24 @@ namespace BlazorTicTacToe.Hubs
 				room.Game.StartGame();
 				await Clients.Group(roomId).SendAsync("UpdateGame",room);
 			}
+		}
+
+		public async Task MakeMove(string roomId, int row, int col, string playerId)
+		{
+			var room = _rooms.FirstOrDefault(r => r.RoomId == roomId);
+			if (room != null && room.Game.MakeMove(row, col, playerId))
+			{
+				room.Game.Winner = room.Game.CheckWinner();
+				room.Game.IsDraw = room.Game.CheckDraw() 
+				                   && string.IsNullOrEmpty(room.Game.Winner);
+				if (!string.IsNullOrEmpty(room.Game.Winner) || room.Game.IsDraw)
+				{
+					room.Game.GameOver = true;
+				}
+
+				await Clients.Group(roomId).SendAsync("UpdateGame", room);
+			}
+
 		}
 
 

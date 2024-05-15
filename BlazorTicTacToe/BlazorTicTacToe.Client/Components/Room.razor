@@ -42,6 +42,7 @@
 
 
 		<table class="tic-tac-toe">
+
 			@for (int row = 0; row < 3; row++)
 			{
 				<tr>
@@ -49,7 +50,7 @@
 					{
 						var r = row;
 						var c = col;
-						<td @onclick="() => MakeMove(r,c)">
+						<td @onclick="() => MakeMove(r, c)">
 							@CurrentRoom.Game.Board[r][c]
 						</td>
 					}
@@ -111,7 +112,24 @@
 
 	private async Task MakeMove(int row, int col)
 	{
+		if (IsMyTurn()
+		    && CurrentRoom is not null
+		    && CurrentRoom.Game is { GameStarted: true, GameOver: false }
+		    && HubConnection is not null)
+		{
+			await HubConnection.InvokeAsync("MakeMove",
+				CurrentRoom.RoomId,
+				row,
+				col,
+				myPlayerId);
 
+		}
+
+		await HubConnection.InvokeAsync("MakeMove",
+			CurrentRoom.RoomId,
+			row,
+			col,
+			myPlayerId);
 	}
 
 	private bool IsMyTurn()
